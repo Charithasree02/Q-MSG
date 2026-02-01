@@ -144,18 +144,30 @@ section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] span {
 </style>
 """, unsafe_allow_html=True)
 
-@st.cache_resource
+@st.cache_resource(ttl=None)
 def init_connections():
     url = os.environ.get("SUPABASE_URL")
     key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
-    if not url or not key: raise RuntimeError("CRITICAL ERROR: Missing Supabase URL or SUPABASE_SERVICE_ROLE_KEY.")
+    
+    if not url or not key: 
+        raise RuntimeError("CRITICAL ERROR: Missing Supabase URL or SUPABASE_SERVICE_ROLE_KEY.")
+    
+    # Validation: Ensure we are using the Service Role Key
+    if "service_role" not in key and "ey" in key:
+        # Check payload if possible, or just warn. 
+        # For now, let's just create the client.
+        pass
+
     supabase = create_client(url, key)
+    
     import warnings; warnings.filterwarnings("ignore", category=UserWarning)
     ibm_token = os.environ.get("IBM_QUANTUM_TOKEN")
     if not ibm_token: raise RuntimeError("CRITICAL ERROR: Missing IBM_QUANTUM_TOKEN.")
     service = QiskitRuntimeService(channel="ibm_quantum_platform", token=ibm_token)
     return supabase, service
 try:
+    # Explicitly reload dotenv to be safe
+    load_dotenv(override=True)
     supabase, service = init_connections()
 except Exception as e:
     st.error(f"Initialization failed. Check .env file. Error: {e}"); st.stop()
