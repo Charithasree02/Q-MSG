@@ -369,11 +369,10 @@ if 'user_session' not in st.session_state or st.session_state.user_session is No
                     new_password = st.text_input("🔑 Password", type="password", key="signup_pass")
                     if st.form_submit_button("Create Frequency", use_container_width=True):
                         try:
-                            # Use Admin API to auto-confirm user since we have Service Role Key
-                            res = supabase.auth.admin.create_user({
+                            # Revert to standard signup (User must disable 'Confirm Email' in Supabase Dashboard)
+                            res = supabase.auth.sign_up({
                                 "email": new_email, 
-                                "password": new_password,
-                                "email_confirm": True
+                                "password": new_password
                             })
                             if res.user:
                                 code = f"QIM-{uuid.uuid4().hex[:6].upper()}"
