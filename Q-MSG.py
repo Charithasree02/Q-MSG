@@ -369,11 +369,16 @@ if 'user_session' not in st.session_state or st.session_state.user_session is No
                     new_password = st.text_input("🔑 Password", type="password", key="signup_pass")
                     if st.form_submit_button("Create Frequency", use_container_width=True):
                         try:
-                            res = supabase.auth.sign_up({"email": new_email, "password": new_password})
+                            # Use Admin API to auto-confirm user since we have Service Role Key
+                            res = supabase.auth.admin.create_user({
+                                "email": new_email, 
+                                "password": new_password,
+                                "email_confirm": True
+                            })
                             if res.user:
                                 code = f"QIM-{uuid.uuid4().hex[:6].upper()}"
                                 supabase.table('profiles').insert({"id": res.user.id, "email": res.user.email, "sharing_code": code}).execute()
-                                st.success("Frequency Created. Please Login.")
+                                st.success("Frequency Created. Email Auto-Verified. Please Login.")
                         except Exception as e:
                             st.error(f"Creation Failed: {e}")
 
