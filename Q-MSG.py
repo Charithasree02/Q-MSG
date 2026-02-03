@@ -694,7 +694,7 @@ elif page == "Inbox":
             else:
                 st.success("✅ DECODED")
         
-        st.markdown("---")
+        st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)
         
         if status == "COMPLETED":
             if it.get("reconstructed_image_url"):
@@ -735,7 +735,7 @@ elif page == "Sent":
             if status == "RUNNING": st.warning("PROCESSING")
             else: st.success("DELIVERED")
         
-        st.markdown("---")
+        st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)
         
         if status == "COMPLETED":
             c_img1, c_img2 = st.columns(2)
